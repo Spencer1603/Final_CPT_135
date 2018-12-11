@@ -1,3 +1,9 @@
+'''
+Created on Dec 11, 2018
+
+@author: M.Spencer, M. Reilling, A. Hicks
+'''
+
 from tkinter import *
 import tkinter.messagebox
 import os.path
@@ -13,6 +19,9 @@ class Calculator(Frame):
         self._display.grid(row = 0, column = 0, rowspan = 2, columnspan = 5, sticky = N+S+E+W)
         self._displayArea = Text(self._display, width = 80, height = 10)
         self._displayArea.grid(row = 0, column = 0, sticky = N+S+E+W)
+        
+        userVar = input("")
+        userCurrent = ""
         
         #Number Buttons
         self._9Btn = Button(self, text = "9", command = self._9Press)
@@ -50,10 +59,10 @@ class Calculator(Frame):
         self._decimalBtn.grid(row = 7, column = 1)
         
         self._parenBtn = Button(self, text = "(", command = self._parenPress)
-        self._parenBtn.grid(row = 7, column = 2)
+        self._parenBtn.grid(row = 3, column = 3)
         
         self._endParenBtn = Button(self, text = ")", command = self._endParenPress)
-        self._endParenBtn.grid(row = 7, column = 3)
+        self._endParenBtn.grid(row = 3, column = 4)
         
         self._negativeBtn = Button(self, text = ")", command = self._negativePress)
         self._negativeBtn.grid(row = 7, column = 4)
@@ -72,66 +81,100 @@ class Calculator(Frame):
         self._subtractBtn = Button(self, text = "-", command = self._subtractPress)
         self._subtractBtn.grid(row = 7, column = 4)
         
-        self.equalBtn = Button(self, text = "-", command = self._subtractPress)
+        self.equalBtn = Button(self, text = "-", command = self._equalPress)
         self._subtractBtn.grid(row = 7, column = 5)
+        
 
-
-Cosine
-Tangeant
-
-        self._sineBtn = Button(self, text = "sin", command = self._sinePress)
+        self._sineBtn = Button(self, text = "SIN", command = self._sinePress)
         self._sineBtn.grid(row = 3, column = 0)
-    
+
+        self._cosineBtn = Button(self, text = "COS", command = self._cosinePress)
+        self._cosineBtn.grid(row = 3, column = 1)
+
+        self._tangeantBtn = Button(self, text = "TAN", command = self._tangeantPress)
+        self._tangeantBtn.grid(row = 3, column = 2)
     
     #Number Button Functions    
-    def _9Press(self):
-        return None
+    def _9Press(self, userVar):
+        self._displayArea.insert(END, "9")
+
+    def _8Press(self, userVar):
+        self._displayArea.insert(END, "8")
+
+    def _7Press(self, userVar):
+        self._displayArea.insert(END, "7")
         
-    def _8Press(self):
-        return None
+    def _6Press(self, userVar):
+        self._displayArea.insert(END, "6")
     
-    def _7Press(self):
-        return None
-        
-    def _6Press(self):
-        return None
+    def _5Press(self, userVar):
+        self._displayArea.insert(END, "5")
     
-    def _5Press(self):
-        return None
+    def _4Press(self, userVar):
+        self._displayArea.insert(END, "4")
     
-    def _4Press(self):
-        return None
+    def _3Press(self, userVar):
+        self._displayArea.insert(END, "3")
     
-    def _3Press(self):
-        return None
+    def _2Press(self, userVar):
+        self._displayArea.insert(END, "2")
     
-    def _2Press(self):
-        return None
+    def _1Press(self, userVar):
+        self._displayArea.insert(END, "1")
     
-    def _1Press(self):
-        return None
-    
-    def _0Press(self):
-        return None 
+    def _0Press(self, userVar):
+        self._displayArea.insert(END, "0")
     
     #Decimal button function
     def _decimalPress(self):
-        return None
+        self._displayArea.insert(END, ".")
     
     #Negative sign button function
     def _negativePress(self):
-        return None
+        self._displayArea.insert(END, "-")
    
     #Parenthesis buttons functions
     def _parenPress(self):   
-        return None
+        self._displayArea.insert(END, "(")
     
     #Parenthesis buttons functions
     def _endParenPress(self):   
-        return None
+        self._displayArea.insert(END, ")")
     
     #Operation Buttons
         
+    def _multiplyPress(self):
+        self._displayArea.insert(END, " * ")
+    
+    def _dividePress(self):
+        self._displayArea.insert(END, " / ")
+    
+    def _addPress(self):
+       self._displayArea.insert(END, " + ")
+    
+    def _subtractPress(self):
+        self._displayArea.insert(END, " -")
+    
+    #Decimal button function
+    def _decimalPress(self, userVar):
+        return None
+    
+    #Negative sign button function
+    def _negativePress(self, userVar):
+        userVar = float(userVar)
+        userVar = -userVar
+        userVar = str(userVar)
+        
+    #Parenthesis buttons functions
+    def _parenPress(self, userVar, userCurrent):
+           
+        userVar = "(" + userVar
+    
+    def _endParenPress(self, userVar, userCurrent):   
+        userVar = userVar + ")"
+        
+    
+    #Operation Buttons   
     def _multiplyPress(self):
         return None
     
@@ -144,10 +187,21 @@ Tangeant
     def _subtractPress(self):
         return None
     
-    def _sinePress(self):
+    def _equalPress(self):
         return None
+    
+    def _sinePress(self):
+        self._displayArea.insert(END, "sin(")
+    
+    def _cosinePress(self):
+        self._displayArea.insert(END, "cos(")
+    
+    def _tangeantPress(self):
+        self._displayArea.insert(END, "tan(")
+        
+    self._displayArea.insert(END, "pi")
 
 def main(): 
     Calculator().mainloop()
 
-main()
+main
