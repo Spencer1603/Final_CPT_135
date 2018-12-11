@@ -192,7 +192,8 @@ class Calculator(Frame):
     
     def _sinePress(self):
         self._displayArea.insert(END, "sin(")
-    
+        _parenPress()
+        
     def _cosinePress(self):
         self._displayArea.insert(END, "cos(")
     
