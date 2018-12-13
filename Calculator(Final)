@@ -3,280 +3,126 @@ Created on Dec 11, 2018
 
 @author: M.Spencer, M. Reilling, A. Hicks
 '''
-
 from tkinter import *
 import tkinter.messagebox
 import math
-import os.path
+import data
 
-class Calculator(Frame):
-    def __init__(self):
-        #Variables and constants
-        self._userVar = ""
-        self._varCurrent = []
-        self._opCurrent = []
-        
-        '''
-        x = 0.0
-        PI = math.pi(x)
-        SINE = math.sin(x)
-        COSINE = math.cos(x)
-        TANGEANT = math.tan(x)
-        '''
-        
-        self._decimalPressed = False
-        self._endParenNeeded = 0
-        
-        #Setup window and widgets
-        Frame.__init__(self)
-        self.master.title("Text Editor")
+class CalculatorFrame(Frame):
+    def __init__(self, master):
+    
+        tkinter.Frame.__init__(self, master)
+        self.master = master
+        self.master.title("Calculator")
         self.grid()
         
-        self._display = Frame(self)
-        self._display.grid(row = 0, column = 0, rowspan = 2, columnspan = 5, sticky = N+S+E+W)
-        self._displayArea = Text(self._display, width = 80, height = 10)
+        self.button_dict = data.button_dict
+
+        #creates and configures the display
+        self._display = Frame(master)
+        self._display.grid(row = 0, column = 0, columnspan = 5, sticky = N+S+E+W)
+        self._displayArea = Entry(self._display, width = 27)
+        self._displayArea.configure(font = ("Arial", 24, "bold"))
         self._displayArea.grid(row = 0, column = 0, sticky = N+S+E+W)
-        
-        #Number Buttons
-        self._9Btn = Button(self, text = "9", command = self._9Press)
-        self._9Btn.grid(row = 4, column = 2)
-        
-        self._8Btn = Button(self, text = "8", command = self._8Press)
-        self._8Btn.grid(row = 4, column = 1)
-        
-        self._7Btn = Button(self, text = "7", command = self._7Press)
-        self._7Btn.grid(row = 4, column = 0)
-        
-        self._6Btn = Button(self, text = "6", command = self._6Press)
-        self._6Btn.grid(row = 5, column = 2)
-        
-        self._5Btn = Button(self, text = "5", command = self._5Press)
-        self._5Btn.grid(row = 5, column = 1)
-        
-        self._4Btn = Button(self, text = "4", command = self._4Press)
-        self._4Btn.grid(row = 5, column = 0)
 
-        self._3Btn = Button(self, text = "3", command = self._3Press)
-        self._3Btn.grid(row = 6, column = 2)
+        self.create_buttons()
         
-        self._2Btn = Button(self, text = "2", command = self._2Press)
-        self._2Btn.grid(row = 6, column = 1)
-        
-        self._1Btn = Button(self, text = "1", command = self._1Press)
-        self._1Btn.grid(row = 6, column = 0)
-        
-        self._0Btn = Button(self, text = "0", command = self._0Press)
-        self._0Btn.grid(row = 7, column = 0)
-        
-        #Decimal button, and parenthesis buttons
-        self._decimalBtn = Button(self, text = ".", command = self._decimalPress)
-        self._decimalBtn.grid(row = 7, column = 1)
-        
-        '''
-        self._parenBtn = Button(self, text = "(", command = self._parenPress)
-        self._parenBtn.grid(row = 3, column = 3)
-        
-        self._endParenBtn = Button(self, text = ")", command = self._endParenPress)
-        self._endParenBtn.grid(row = 3, column = 4)
-        '''
-        
-        self._negativeBtn = Button(self, text = ")", command = self._negativePress)
-        self._negativeBtn.grid(row = 7, column = 4)
-        
-        
-        #Operation Buttons
-        self._multiplyBtn = Button(self, text = "*", command = self._multiplyPress)
-        self._multiplyBtn.grid(row = 4, column = 4)
-        
-        self._divideBtn = Button(self, text = "/", command = self._dividePress)
-        self._divideBtn.grid(row = 5, column = 4)
-        
-        self._addBtn = Button(self, text = "+", command = self._addPress)
-        self._addBtn.grid(row = 6, column = 4)
-        
-        self._subtractBtn = Button(self, text = "-", command = self._subtractPress)
-        self._subtractBtn.grid(row = 7, column = 4)
-        
-        self.equalBtn = Button(self, text = "-", command = self._equalPress)
-        self._subtractBtn.grid(row = 7, column = 5)
-        
-        '''
-        self._sineBtn = Button(self, text = "SIN", command = self._sinePress)
-        self._sineBtn.grid(row = 3, column = 0)
+    def create_buttons(self):
+        #loops through to assign values for each button
+        button_column = 0
+        button_row = 2
+        i = 0
+        self._text_buttons = data.button_rows
+        self._text_val = data.button_vals
+        for button_rows in self._text_buttons:
+            for text_button in button_rows:             
+                self.config_button(i, text_button, button_row, button_column)
+                i += 1
+                button_column += 1
+            button_row += 1
+            button_column = 0
+    
+    def config_button(self, i, text_button, button_row, button_column):
+        #creates and configures buttons, using variables from loops
+        n = list(self.button_dict.keys())[list(self.button_dict.values()).index(text_button)]
+        self.button_dict[n] = tkinter.Button(self.master, text=text_button, width=6, command=lambda:self.action(text_button))
+        self.button_dict[n].config(padx=6, pady=3, font=("Arial", 18))
+        self.button_dict[n].grid(row=button_row,column=button_column)
 
-        self._cosineBtn = Button(self, text = "COS", command = self._cosinePress)
-        self._cosineBtn.grid(row = 3, column = 1)
-
-        self._tangeantBtn = Button(self, text = "TAN", command = self._tangeantPress)
-        self._tangeantBtn.grid(row = 3, column = 2)
-        '''
-    
-    #Number Button Functions
-    def _9Press(self, _userVar):
-        self._displayArea.insert(END, "9")
-        self._userVar = self._userVar + "9"
-
-    def _8Press(self, _userVar):
-        self._displayArea.insert(END, "8")
-        self._userVar = self._userVar + "8"
-
-    def _7Press(self, _userVar):
-        self._displayArea.insert(END, "7")
-        self._userVar = self._userVar + "7"
         
-    def _6Press(self, _userVar):
-        self._displayArea.insert(END, "6")
-        self._userVar = self._userVar + "6"
-    
-    def _5Press(self, _userVar):
-        self._displayArea.insert(END, "5")
-        self._userVar = self._userVar + "5"
-    
-    def _4Press(self, _userVar):
-        self._displayArea.insert(END, "4")
-        self._userVar = self._userVar + "4"
-    
-    def _3Press(self, _userVar):
-        self._displayArea.insert(END, "3")
-        self._userVar = self._userVar + "3"
-    
-    def _2Press(self, _userVar):
-        self._displayArea.insert(END, "2")
-        self._userVar = self._userVar + "2"
-    
-    def _1Press(self, _userVar):
-        self._displayArea.insert(END, "1")
-        self._userVar = self._userVar + "1"
-    
-    def _0Press(self, _userVar):
-        self._displayArea.insert(END, "0")
-        self._userVar = self._userVar + "0"
-    
-    #Decimal button function
-    def _decimalPress(self, _userVar, decimalPressed):
-        if not decimalPressed:
-            self._displayArea.insert(END, ".")
-            self._userVar = self._userVar + "."
-            decimalPressed = True
+    def getandreplace(self):
+        self.expression = self._displayArea.get()
+        self.newtext=self.expression.replace('SQRT(','^')
+        self.newtext=self.newtext.replace('math.sqrt(','**')
+        return self.newtext
+              
+    def equals(self):
+        #when the equal button is pressed
+        self.getandreplace()
+        try: 
+            self.value = eval(self.newtext) #evaluate the expression using the eval function
+        except SyntaxError or NameError:
+            self._displayArea.delete(0,END)
+            self._displayArea.insert(0,'Invalid Input!')
         else:
-            tkinter.messagebox("You already have a decimal pressed for this number.")
-        
-    #Negative sign button function
-    def _negativePress(self, _userVar):
-        self._displayArea.insert(1.0, "-")
-        self._userVar = float(self._userVar)
-        self._userVar = -self._userVar
-        self._userVar = str(self._userVar)
+            self._displayArea.delete(0,END)
+            self._displayArea.insert(0,self.value)
     
-    #not sure how to get these to work yet
-    '''   
-    #Parenthesis buttons functions
-    def _parenPress(self, userVar, endParenNeeded):   
-        self._displayArea.insert(END, "(")
-        userVar = float(userVar)
-        self._varCurrent.append(userVar)
-        self._opCurrent.append("(")
-        userVar = "("
-        decimalPressed = False
-        endParenNeeded += 1
-        
-    #Parenthesis buttons functions
-    def _endParenPress(self, userVar, decimalPressed, endParenNeeded):   
-        self._displayArea.insert(END, ")")
-        self._userVar = userVar + ")"
-        userVar = float(userVar)
-        self._varCurrent.append(userVar)
-        self._opCurrent.append(")")
-        userVar = ""
-        decimalPressed = False
-        endParenNeeded -= 1
-    ''' 
+    def clearall(self): 
+        #CE, or Clear Everything, clears the entry field
+        self._displayArea.delete(0,END)
     
-    #Operation Buttons
-    def _multiplyPress(self, _userVar):
-        self._displayArea.insert(END, " * ")
-        self._userVar = float(self._userVar)
-        self._varCurrent.append(self._userVar)
-        self._opCurrent.append(" * ")
-        self._userVar = ""
-        decimalPressed = False
-    
-    def _dividePress(self, _userVar):
-        self._displayArea.insert(END, " / ")
-        self._userVar = float(self._userVar)
-        self._varCurrent.append(self._userVar)
-        self._opCurrent.append(" / ")
-        self._userVar = ""
-        decimalPressed = False
-    
-    def _addPress(self, _userVar):
-        self._displayArea.insert(END, " + ")
-        self._userVar = float(self._userVar)
-        self._varCurrent.append(self._userVar)
-        self._opCurrent.append(" + ")
-        self._userVar = ""
-        decimalPressed = False
-    
-    def _subtractPress(self, _userVar):
-        self._displayArea.insert(END, " - ")
-        self._userVar = float(self._userVar)
-        self._varCurrent.append(self._userVarr)
-        self._opCurrent.append(" - ")
-        self._userVar = ""
-        decimalPressed = False
+    def clear1(self):
+        #C, or Clear, deletes one entry
+        self.txt = self._displayArea.get()[:-1]
+        self._displayArea.delete(0,END)
+        self._displayArea.insert(0,self.txt)   
      
-    def _equalPress(self, _userVar, _varCurrent, _opCurrent):
-        self._userVar =  float(self._userVar)
-        self._varCurrent.append(self._userVar)
-        self._userVar = ""
-        self._currentNum = "0.0"
-        self._prevNum = "0.0"
-        
-        for i in range(len(_varCurrent)):
-            if self._currentNum == "0.0":
-                if self._prevNum == "0.0":
-                    float(self._prevNum)
-                    self._prevNum = self._varCurrent[i]
-                    continue
-                
-                else:
-                    float(self._currentNum)
-                    self._currentNum = self._varCurrent[i]
-                    continue
-                
-            for i in range(len(_opCurrent)):
-                if self._opCurrent[i] == " * ":
-                    self._prevNum = self._prevNum * self._currentNum
-                    self._currentNum = "0.0"
-                    
-                elif self._opCurrent[i] == " / ":
-                    self._prevNum = self._prevNum / self._currentNum
-                    self._currentNum = "0.0"
-                    
-                elif self._opCurrent[i] == " + ":
-                    self._prevNum = self._prevNum + self._currentNum
-                    self._currentNum = "0.0"
-                    
-                elif self._opCurrent[i] == " - ":
-                    self._prevNum = self._prevNum - self._currentNum
-                    self._currentNum = "0.0"
-                
-        self._displayArea.insert(END, self._prevNum)
+    def action(self, argi): 
+        #Pressed button's value inserted at end of entry field
+        if argi == "=":
+            self.equals()
+        elif argi == "C":
+            self.clear1()
+        elif argi == "CE":
+            self.clearall()
+        else:
+            self._displayArea.insert(END, argi)
+            
+def main():
+    #sets up our GUI
+    cal = tkinter.Tk()
+    CalculatorFrame(cal)
+    cal.mainloop()
+     
     
-    #def _sinePress(self):
-        #self._displayArea.insert(END, "sin(")
-        #_parenPress()
-        
-    #def _cosinePress(self):
-        #self._displayArea.insert(END, "cos(")
+main()           
+        #loops through to assign values for each button
+        button_column = 0
+        button_row = 2
+        i = 0
+        self._text_buttons = data.button_rows
+        self._text_val = data.button_vals
+        for button_rows in self._text_buttons:
+            for text_button in button_rows:             
+                self.config_button(i, text_button, button_row, button_column)
+                i += 1
+                button_column += 1
+            button_row += 1
+            button_column = 0
     
-    #def _tangeantPress(self):
-        #self._displayArea.insert(END, "tan(")
-        
-    #def _piPress(self):
-    #self._displayArea.insert(END, "pi")
-
-def main(): 
-    Calculator().mainloop()
-
-main()
+    def config_button(self, i, text_button, button_row, button_column):
+        #creates and configures buttons, using variables from loops
+        n = list(self.button_dict.keys())[list(self.button_dict.values()).index(text_button)]
+        self.button_dict[n] = tkinter.Button(self.master, text=text_button, width=6, command=lambda:CalculatorFunction.action(self=CalculatorFunction, argi=text_button))
+        self.button_dict[n].config(padx=6, pady=3, font=("Arial", 18))
+        self.button_dict[n].grid(row=button_row,column=button_column)        
+              
+def main():
+    #sets up our GUI
+    cal = tkinter.Tk()
+    CalculatorFrame(cal)
+    cal.mainloop()
+     
+    
+main() 
